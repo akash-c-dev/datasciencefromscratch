@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import division
 users = [
 { "id": 0, "name": "Hero" },
 { "id": 1, "name": "Dunn" },
@@ -30,3 +31,43 @@ def num_of_friends(user):
 total_connections = sum(num_of_friends(user) for user in users)
 
 print total_connections
+
+num_users = len(users)
+avg_connections = total_connections / num_users
+
+print avg_connections
+
+num_friends_by_id = [(user["id"],num_of_friends(user)) for user in users]
+sorted(num_friends_by_id ,key=lambda(user_id, num_friends):num_friends,reverse=True)
+
+
+def friends_of_friend_ids_bad(user):
+    return [foaf["id"]
+                for friend in user["friends"]
+                for foaf in friend["friends"]]
+
+print friends_of_friend_ids_bad(users[0])
+print friends_of_friend_ids_bad(users[3])
+print friends_of_friend_ids_bad(users[7])
+
+
+from collections import Counter
+
+def not_the_same(user, other_user):
+    return user["id"] != other_user["id"]
+
+def not_friends(user, other_user):
+    return all(not_the_same(friend, other_user)
+                    for friend in user["friends"])
+
+print not_friends(users[3],users[0])
+
+def friends_of_friend_ids(user):
+    return Counter(foaf["id"]
+        for friend in user["friends"]
+        for foaf in friend["friends"]
+        if not_the_same(user,foaf) and not_friends(user, foaf))
+
+print friends_of_friend_ids(users[0])
+print friends_of_friend_ids(users[3])
+print friends_of_friend_ids(users[7])
